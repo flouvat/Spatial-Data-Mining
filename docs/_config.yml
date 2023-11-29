@@ -18,11 +18,11 @@
 # You can create any custom variable you would like, and they will be accessible
 # in the templates via {{ site.myvariable }}.
 
-title: X.0X Template de cours
+title: Chapitre Fouille de données Spatiales et Spatio-Temporelles
 email: frederic.flouvat@univ-amu.fr
 description: >- # this means to ignore newlines until "baseurl:"
-  cours du BUT informatique, IUT Aix-en-Provence, Aix-Marseille Université
-baseurl: "/X.0X-Template" # the subpath of your site, e.g. /blog
+  cours du Master informatique SID, Aix-Marseille Université
+baseurl: "/Spatial-Data-Mining" # the subpath of your site, e.g. /blog
 url: "https://flouvat.github.io" # the base hostname & protocol for your site, e.g. http://example.com
 #twitter_username: jekyllrb
 github_username:  flouvat
