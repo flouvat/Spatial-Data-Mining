@@ -3,7 +3,7 @@
 Objectifs : Introduction à la fouille de données spatiales
 
 Chapitres :
-1. chapitre 
+1. Manipuler des données géographiques 
 2. chapitre
 
 Volume horaire :  6 h CM/TD
