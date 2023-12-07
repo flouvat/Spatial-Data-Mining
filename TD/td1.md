@@ -38,7 +38,7 @@ Ces données  se présentent principalement sous deux formes :
 
 ### Les données vectorielles
 
-Les données vectorielles s'attachent à représenter des formes (des objets géométriques) et à les positionner dans un système de coordonnées. Elles correspondent donc simplement à une collection de coordonnées à deux dimensions `(x,y)` ou a trois dimensions `(x,y,z)`, appelées "sommets". Ces sommets sont utilisés pour définir les objets suivants :
+Les données vectorielles s'attachent à représenter des formes (des objets géométriques) et à leur positionnement dans un système de coordonnées. Elles correspondent donc simplement à une collection de coordonnées à deux dimensions `(x,y)` ou a trois dimensions `(x,y,z)`, appelées "sommets". Ces sommets sont utilisés pour définir les objets suivants :
 - `Point` : un seul point (p.ex. l'emplacement d'une personne)
 - `Ligne` : deux ou plusieurs points connectés (p.ex. une route)
 - `Polygone` : trois points ou plus connectés et fermés (p.ex. un bâtiment,  un lac ou la frontière d'un pays)
@@ -47,13 +47,13 @@ Les données vectorielles s'attachent à représenter des formes (des objets gé
 ![basic vector data](td1-img/2-vector.png)
 
 
-Comme illustré ci-dessous, ces objets peuvent être combinées pour aboutir à des données plus complexes telles que des `multi-points`, `multi-lignes`, `multi-polygones` ou `collections géométriques`.
+Comme illustré ci-dessous, ces objets peuvent être combinés pour aboutir à des données plus complexes telles que des `multi-points`, `multi-lignes`, `multi-polygones` ou des `collections géométriques`.
 
 ![complex vector data](td1-img/2-SpatialDataModel.png)
 
 ### Les données rasters
 
-Contrairement aux données vectorielles, les données raster correspondent à une matrice de valeurs de `pixels` (également appelées "cells"). Chaque pixel représente une petite zone et contient une valeur numérique.
+Contrairement aux données vectorielles, les données `raster` correspondent à une `matrice` de valeurs de `pixels` (également appelées "cells"). Chaque pixel représente une petite zone et contient une valeur numérique.
 
 ![raster](td1-img/2-raster.png)
 
@@ -62,21 +62,21 @@ Les données raster sont des images pour lesquelles chaque pixel représente une
 
 ![resolution](td1-img/2-raster-resolution.png)
 
-Les données raster sont utilisées dans différents contexte. Par exemple, les images satellitaires sont des raster, tout comme les Modèle Numérique de Terrain (MNT, i.e. Digital Elevation Model ou DEM en anglais). Les données raster peuvent issues de télédétection ("remote sensing"), i.e. d’instruments permettant d’acquérir à distance des informations sur un objet géographique. Typiquement, ces rasters sont capturés par des satellites, des avions ou des drones. 
+Les données raster sont utilisées dans différents contextes. Par exemple, les images satellitaires sont des raster, tout comme les Modèle Numérique de Terrain (MNT, i.e. Digital Elevation Model ou DEM en anglais). Les données raster peuvent être issues de télédétection ("remote sensing"), i.e. d’instruments permettant d’acquérir à distance des informations sur un objet géographique. Souvent, ces rasters sont capturés par des satellites, des avions ou des drones. 
 
 Comme expliqué dans la documentation de [ArcGIS](https://pro.arcgis.com/fr/pro-app/latest/help/data/imagery/raster-bands-pro-.htm), certaines de ces images peuvent être composées d'une bande ou couche (i.e. mesurer une seule caractéristique), alors que d'autres peuvent être composées de plusieurs bandes (i.e. mesurer plusieurs caractéristiques). On parle alors d'`images multi-bandes`. Dans ce cas, chaque pixel est associé à plusieurs valeurs (autant que de bandes). Chaque bande correspond ainsi à une matrice de valeurs. Une bande représente une partie du spectre électromagnétique détecté par un capteur (p.ex. rouge, vert, bleu, proche infrarouge ou ultraviolet). Par exemple, les images Landsat-9 comportent 11 bandes différentes.
 
 ![raster multiband](td1-img/2-multiband-raster.gif)
 
-Le nombre et le type de bandes capturées par les différents capteurs peuvent beaucoup varier. Ces informations sont importantes, et déterminent souvent le choix du capteur (p.ex. du satellite d'acquisition). En effet, car certaines bandes sont plus adaptées pour observer certains types d'objets (p.ex. le proche infra-rouge pour la végétation ou l'ultraviolet pour les objets sous la surface de l'eau). D'ailleurs, les géomaticiens ont définis un grand nombre d'indices basés sur une combinaison de bandes afin de mieux identifier et quantifier certains objets. Un exemple classique est le NDVI ("Normalized Difference Vegetative Index") pour étudier la couverture végétale. La  [base de données IDB](https://www.indexdatabase.de/) ("Index DataBase") recense les différents capteurs existants, leurs caractéristiques et les indices calculables à partir de ceux-ci.
+Le nombre et le type de bandes capturées par les différents capteurs peuvent beaucoup varier. Ces informations sont importantes, et déterminent souvent le choix du capteur (p.ex. du satellite d'acquisition). En effet,  certaines bandes sont plus adaptées pour observer certains types d'objets (p.ex. le proche infra-rouge pour la végétation, l'ultraviolet pour les objets sous la surface de l'eau, ou le bleu pour les bâtiments). D'ailleurs, les géomaticiens ont défini un grand nombre d'indices basés sur une combinaison de bandes afin de mieux identifier et quantifier certains objets. Un exemple classique est le NDVI ("Normalized Difference Vegetative Index") permettant d'étudier la couverture végétale. La  [base de données IDB](https://www.indexdatabase.de/) ("Index DataBase") recense les différents capteurs existants, leurs caractéristiques et les indices calculables à partir de ceux-ci.
 
 
 ### Les systèmes de coordonnées de référence (CRS)
 
-Un `système de référence de coordonnées` (CRS) est un élément clé de l'information géographique. Un CRS précise comment les coordonnées ou les géométries sont liées aux lieux sur Terre. Sans le CRS, les données géographiques sont simplement une collection de coordonnées dans un espace arbitraire. Cette information appartient aux `métadonnées`, tout comme l'horodatage de création des données.
+Un `système de coordonnées de référence` ("Coordinate Reference System" ou CRS) est un élément clé de l'information géographique. Un CRS précise comment les coordonnées ou les géométries sont liées aux lieux sur Terre. Sans le CRS, les données géographiques sont simplement une collection de coordonnées dans un espace arbitraire. Cette information appartient aux `métadonnées`, tout comme l'horodatage de création des données.
 
 Un CRS est composé de trois éléments:
-- le `datum`  est un modèle de la taille et de la forme de la Terre (p.ex. ellipsoïde ou géoïde). Il indique aussi l'origine du système de coordonnées et son orientation par rapport à la surface de la terre. L'un des systèmes de référence les plus couramment utilisés est le système géodésique mondial (WGS84).
+- le `datum`  est un modèle de la taille et de la forme de la Terre (p.ex. ellipsoïde ou géoïde). Il indique aussi l'origine du système de coordonnées et son orientation par rapport à la surface de la terre. L'un des systèmes de référence les plus couramment utilisés est le système géodésique mondial (`WGS84`).
 - la `projection cartographique` définit la transformation mathématique utilisée pour projeter la surface de la Terre sur un plan bidimensionnel. 
 - des paramètres supplémentaires telles que le méridien central, le parallèle standard et le facteur d'échelle.
 
@@ -89,7 +89,7 @@ La projection cartographique est une transformation particulièrement complexe q
 
 ![projections](td1-img/2-projections.jpg)
 
-**A noter qu'à une échelle petite (locale) ces distorsions restent minimes.**
+**A noter que ces distorsions restent minimes à une petite échelle (locale).**
 
 ## Manipuler des données vectorielles en Python
 
@@ -100,12 +100,13 @@ Les données vectorielles sont classiquement stockée dans différents types de 
 - des fichiers `geojson`
 - des fichiers `KML`
 
-Ces fichiers peuvent être lus en Python grâce à des bibliothèques telles que [Shapely](https://shapely.readthedocs.io/en/latest/) ou [GeoPandas](https://geopandas.org/en/stable/). Ils permettent de générer des objets géométriques Python, qui peuvent ensuite être traités, fusionnés avec d'autres données, et analysés. Il existe de nombreuses fonctionnalités utiles que vous pouvez par exemple utiliser telles que :
+Ces fichiers peuvent être lus en Python grâce à des bibliothèques telles que [Shapely](https://shapely.readthedocs.io/en/latest/) ou [GeoPandas](https://geopandas.org/en/stable/). Elles permettent de générer des objets géométriques Python, qui peuvent ensuite être traités, fusionnés avec d'autres données, et analysés. Ces bibliothèques intègrent de nombreuses fonctionnalités utiles que vous pouvez par exemple utiliser telles que :
 - Créer une ligne ou un polygone à partir d'une collection de `Point`
 - Calculer les surfaces/longueurs/limites, etc. 
 - Effectuer des opérations géométriques telles que l'union, la différence, la distance, etc. 
 - Effectuer des requêtes spatiales entre les objets telles que l'intersection, l'inclusion, la tangence, le croisement, etc. 
 
+Elles sont sont très importantes dans le cadre de la préparation des données avant analyse ou apprentissage.
 
 ### Représenter des objets géométriques avec Shapely
 
@@ -285,18 +286,18 @@ west_area = multipoly[0].area
 
 ### Manipuler des données SIG avec GeoPandas
 
-La bibliothèque [GeoPandas](https://geopandas.org/en/stable/index.html) est un des principaux outils de traitement de données spatiales. Elle supporte les principaux formats de fichiers SIG et permet d'effectuer simplement des opérations géospatiales.
+La bibliothèque [GeoPandas](https://geopandas.org/en/stable/index.html) est un des principaux outils de traitement de données spatiales. Elle supporte les principaux formats de fichiers SIG et permet d'effectuer simplement des opérations géospatiales. Dans la suite, nous allons nous focaliser sur cette bibliothèque pour manipuler les données géographiques.
 
 
 #### GeoPandas
 
-Cette bibliothèque est construite à partir de [Shapely](https://shapely.readthedocs.io/en/stable/manual.html) et [Pandas](https://pandas.pydata.org/). Pandas est une boîte à outils d'analyse de données facile à utiliser mais puissante. Il s’agit d’un framework d’analyse de données largement utilisé dans différents domaines scientifiques. Pandas s'appuie sur plusieurs autres bibliothèques en arrière-plan telles que `NumPy`, `matplotlib` et `SciPy`. L'une des fonctionnalités les plus utiles de Pandas est sa capacité à interagir avec de nombreux formats de données. Elle offre aussi deux structure de données ([DataFrame](https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html) et `Series`) permettant de manipuler efficacement des données.
+Cette bibliothèque est construite à partir de [Shapely](https://shapely.readthedocs.io/en/stable/manual.html) et [Pandas](https://pandas.pydata.org/). Pandas est une boîte à outils d'analyse de données facile à utiliser mais puissante. Il s’agit d’un framework d’analyse de données largement utilisé dans différents domaines scientifiques. Pandas s'appuie sur plusieurs autres bibliothèques en arrière-plan telles que `NumPy`, `matplotlib` et `SciPy`. L'une des fonctionnalités les plus utiles de Pandas est sa capacité à interagir avec de nombreux formats de données. Elle offre aussi deux structures de données ([DataFrame](https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html) et `Series`) permettant de manipuler efficacement des données.
 
 ![dataframe_series](td1-img/2-pandas-structures-annotated.png)
 
-Tout comme Pandas, GeoPandas fournit deux classes clés pour la manipulation des données spatiales :
-- `GeoSeries` (issu de la classe Series de Pandas) stocke des séquences d'objets géométriques comme des points, des lignes, des polygones
-- `GeoDataFrame` (issu de la classe DataFrame de Pandas) stocke des données sous forme de feuilles de calculs ayant au moins une colonne géométrique (une GeoSeries).
+Tout comme Pandas, `GeoPandas` fournit deux classes clés pour la manipulation des données spatiales :
+- `GeoSeries` (issu de la classe `Series` de Pandas) stocke des séquences d'objets géométriques comme des points, des lignes, ou des polygones.
+- `GeoDataFrame` (issu de la classe `DataFrame` de Pandas) stocke des données sous forme de feuilles de calculs ayant au moins une colonne géométrique (une GeoSeries).
 
 ![GeoDataFrame](td1-img/2-geopandas.png)
 
@@ -309,20 +310,328 @@ S57, SQLite, TopoJSON).
 
 L'un des formats les plus utilisés pour stocker des données vectorielles est le format `shapefile`. Il a été introduit par [ESRI](https://www.esrifrance.fr/), un des leaders des Systèmes d’Information Géographique (SIG), dans les années 90. Il est devenu depuis l'un des standards en la matière. Nous allons donc tout d'abord lire ce type de fichier.
 
-Un `shapefile` est composé de 3 fichiers obligatoires avec le même préfixe, comme par exemple "spatial-data", mais des extensions différentes :
-- spatial-data.shp: fichier principal qui stocke les informations de chaque forme géométrique
-- spatial-data.shx: index de la manière dont les géométries du fichier principal sont liées les unes aux autres
-- spatial-data.dbf: attributs de chaque enregistrement
+Un `shapefile` est composé de plusieurs fichiers ayant le même préfixe, comme par exemple "spatial-data", mais des extensions différentes :
+- spatial-data.shp: fichier principal qui stocke les informations de chaque objet géométrique
+- spatial-data.dbf: attributs de chaque objet
+- spatial-data.shx: index des objets permettant de les parcourir plus efficacement
+- spatial-data.prj: le système de projection utilisé
 
 
  Chaque `shapefile` ne peut contenir qu'un seul type de forme. Par exemple, les descriptions d'une maison (point), d'une route (ligne) et  d'une ville (polygone) seraient stockées dans trois shapefiles distincts.
 
+Nous allons prendre quelques exemples de données pour illustrer l'utilisation de GeoPandas pour lire différents formats de données.
+
+Le code suivant charge un shapefile contenant les [circuits de randonnées en Albigeois](https://www.data.gouv.fr/fr/datasets/deplacements-doux-ballades-et-randonnees-en-albigeois/). Cette donnée est mise à disposition par la plateforme du gouvernement dédiée à l'`Open Data`: [https://www.data.gouv.fr/fr/](https://www.data.gouv.fr/fr/). Testez-le dans votre codespace.
+
+```python
+import geopandas as gpd
+
+# Read Esri Shapefile
+fp = "../data/balades-en-albigeois-actu.shp"
+data = gpd.read_file(fp)
+display( data.head() )
+```
+
+La même syntaxe fonctionne pour d'autres formats de données vectorielles courants. Dans l'exemple ci-dessous, nous avons la même données contenant la [liste des festivals en France](https://www.data.gouv.fr/fr/datasets/liste-des-festivals-en-france/) stockée dans différents formats. A noter que les fichiers composant le shapefile sont réunies dans une même archive zip sans que cela pose un problème pour GeoPandas.
+
+```python
+# Read Esri Shapefile
+fp = "../data/festivals-global-festivals-_-pl.zip"
+dataShpe = gpd.read_file(fp)
+display( dataShpe.head() )
+
+# Read CSV format
+fp = "../data/festivals-global-festivals-_-pl.csv"
+dataCSV = gpd.read_file(fp)
+display( dataCSV.head() )
+
+# Read GeoJSON format
+fp = "../data/festivals-global-festivals-_-pl.geojson"
+dataGeoJSON = gpd.read_file(fp)
+display( dataGeoJSON.head() )
+
+```
+
+Il est possible d'écrire les données vectorielles chargées dans un `GeoDataFrame` en utilisant la méthode [to_file](https://geopandas.org/en/stable/docs/reference/api/geopandas.GeoDataFrame.to_file.html). Le format du fichier est  détecté automatiquement à partir de l'extension du fichier.
+
+```python
+# Write to GeoJSON (just make a copy)
+outfp = "../data/Temp/balades-en-albigeois-actu.geojson"
+data.to_file()
+```
+
+Il est possible de créer des données spatiales à partir de zéro en utilisant les objets géométriques de `Shapely`  et `Geopandas`. Nous allons d'abord créer un simple `GeoDataFrame` basé sur des informations de coordonnées qui représentent les contours de la place du Sénat à Helsinki, en Finlande . Voici les coordonnées sur la base desquelles nous pouvons créer un objet  `Polygon` en utilisant `Shapely`.
+
+``` python
+from shapely.geometry import Polygon
+import geopandas as gpd
+
+# Coordinates of the Helsinki Senate square in decimal degrees
+coordinates = [
+    (24.950899, 60.169158),
+    (24.953492, 60.169158),
+    (24.953510, 60.170104),
+    (24.950958, 60.169990),
+]
+
+# Create a Shapely polygon from the coordinate-tuple list
+poly = Polygon(coordinates)
+```
+
+Nous pouvons maintenant utiliser ce polygone et `GeoPandas` pour créer un `GeoDataFrame` à partir de zéro. Les données peuvent être transmises sous forme de liste d'objets. Dans notre cas, nous n'aurons qu'une seule ligne et une seule colonne de données. Nous pouvons passer le polygone dans une liste et devons nommer la colonne `geometry` afin qu'elle puisse être reconnue par `GeoPandas`. Nous pourrions aussi  définir le système de référence de coordonnées comme le montre la définition du constructeur de la classe [GeoDataFrame](https://geopandas.org/en/stable/docs/reference/api/geopandas.GeoDataFrame.html).
+
+```python
+# Create the GeoDataFrame with the newly created polygon
+newdata = gpd.GeoDataFrame(data=[poly], columns=["geometry"])
+display(newdata)
+```
+
+Il est aussi possible des informations complémentaires (i.e. des attributs à l'objet) en ajoutant une nouvelle colonne `name`.
+
+```python
+# Add a new column and insert data
+newdata.at[0, "name"] = "Finnish Senate Square"
+display(newdata)
+```
+
+Dans un certain nombre de cas, les objets géographiques sont simplement enregistrés dans un fichier texte au format `CSV`. La lecture de ces fichiers et leur chargement en mémoire dans un `GeoDataFrame` nécessite de combiner `Shapely`, `Pandas` et `GeoPandas`, car il faut traiter manuellement les colonnes où sont stockées l'information géographique.  L'exemple suivant illustre cela avec le fichier `global-city-population-estimates.csv` contenant le nom de villes ainsi que leur population (en 2015).
+
+```python
+import pandas as pd
+import geopandas as gpd
+
+# Read the desired column in the CSF file and store the data in a DataFrame (Pandas)
+city_population = pd.read_csv("../data/global-city-population-estimates.csv",
+                               delimiter=";",
+                               usecols=["Country or area", "Urban Agglomeration", "Latitude", "Longitude", "Population_2015"]
+                               )
+# Print first data
+print( city_population.head() )
+
+# Convert longitudes and latitudes to spatial points with WGS84 coordinate system (code "EPSG:4326")
+# and add the "geometry" column to the DataFrame
+city_population["geometry"] = gpd.points_from_xy(
+    x=city_population["Longitude"], y=city_population["Latitude"],
+    crs="EPSG:4326"
+)
+
+# Generate a GeoDataFrame based on the DataFrame generated 
+city_population = gpd.GeoDataFrame(city_population)
+print(city_population.head())
+
+```
+
 
 #### Manipuler des données vectorielles avec GeoPandas
 
+Nous allons maintenant quelques opérations classiquement réalisées sur des objets  géométrique avec `GeoPandas`. Pour cela, nous allons nous appuyer sur le fichier [departements-20180101-shp.zip](https://www.data.gouv.fr/fr/datasets/contours-des-departements-francais-issus-d-openstreetmap/) issues d'[OpenStreetMap](https://www.openstreetmap.org/#map=6/46.449/2.210) et représentant le découpage administratif français au niveau des départements.  Il est souvent utile d’effectuer des manipulations géométriques sur les frontières administratives à des fins d’analyse et de visualisation plus approfondies. Nous apprendrons comment générer des centroïdes, différents contours et zones tampons pour les polygones.
 
+Nous commençons par créer un nouveau fichier `useVectorData.ipynb` dans le répertoire `/jupyter`. Dans ce fichier, nous allons commencer par charge le fichier de données au format `shapefile` (mais compressé dans une archive Zip).
 
+```python
+import geopandas as gpd
+import matplotlib.pyplot as plt
 
+# Read in the data and check the contents
+dept = gpd.read_file("../data/departements-20180101-shp.zip")
+display( dept.head() )
+```
+
+On va maintenant étudier la colonne `geometry` qui contient les objets géographiques, en l’occurrence des polygones délimitant les départements. Comme le montre le code ci-dessous, le type de données de la colonne  `geometry` est [GeoSeries](https://geopandas.org/en/stable/docs/reference/api/geopandas.GeoSeries.html). Les données sont transformés en objets géométriques que nous pouvons manipuler via `Shapely` et `GeoPandas`.
+
+```python
+# Check contents of the geometry column
+display( dept["geometry"].head() )
+
+# Check data type of the geometry column
+type( dept["geometry"] )
+
+# Check data type of a value in the geometry column
+type( dept["geometry"].values[0] )
+```
+
+Nous allons maintenant afficher la géométrie des communes en utilisant la méthode [plot](https://geopandas.org/en/stable/docs/reference/api/geopandas.GeoSeries.plot.html) de `GeoPandas`. 
+
+```python
+# Display the geometries in a plot
+dept.plot(facecolor="none", linewidth=0.2)
+```
+
+Cette méthode s'appuie sur [matplotlib](https://matplotlib.org/), une bibliothèque permettant de créer des visualisations statiques, animées ou interactives en Python. Nous allons utiliser cette bibliothèque pour améliorer l'affichage en enlevant simplement les axes.
+
+```python
+# Display the geometries in a plot
+dept.plot(facecolor="none", linewidth=0.2)
+
+# Erase plot axis 
+plt.axis("off")
+plt.show()
+```
+
+Nous pouvons aussi parcourir la `GeoDataFrame` pour afficher un département en particulier, par exemple le quatrième (les bouches-du-Rhône). Pour cela, il suffit d'utiliser l'attribut [iloc](https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.iloc.html#pandas.DataFrame.iloc) pour accéder à un enregistrement particulier.
+
+```python
+# Display the first city name and geometry
+print("Area name:", dept.iloc[3]["nom"], "\t geometry:", dept.iloc[3]["geometry"])
+```
+On constate que l'objet géométrique est un `Multipolygon`, composé donc de plusieurs polygones (le département et ses îles). Pour l'affichage, une option consiste à parcourir tous les polygones du multi-polygone et de les ajouter dans la visualisation l'un après l'autre.
+
+``` python
+# Get the geometry of the 4th object
+bdr = dept["geometry"].values[3]
+
+# Extract the coordinates of each polygon and add it in the plot
+for polygon in bdr.geoms:
+    x, y = polygon.exterior.xy
+    plt.plot(x, y, color='black', linewidth=1)
+
+# Display the polygon
+plt.axis("off")
+plt.figure()
+plt.show()
+```
+
+Une fois le chargement des données effectuées, nous pouvons effectuer des opérations/calculs à partir de la `GeoDataFrame`. Par exemple, il est possible de calculer les centroïdes de tous les objets, comme le montre le code ci-dessous.
+
+```python
+centroids = dept["geometry"].centroid 
+print(centroids)
+```
+
+Nous obtenons un warning lié au système de coordonnées des données (WGS84). En effet, comme indiqué dans le warning, ce référentiel peut engendré des approximations dans le calcul des centroïdes à cause des déformations associées à cette projection. Pour éviter cela, nous allons reprojeter les données dans le référentiel `Lambert Azimuthal Equal Area` (epsg=3035), puis refaire le calcul des centroïdes.
+
+```python
+# Project to EPSG3035
+dept=dept.to_crs(epsg=3035)
+
+# Process centroids for all polygons
+centroids_dept = dept["geometry"].centroid 
+print(centroids_dept)
+
+# Display centroids in a specific area
+centroids_dept.plot(markersize=1)
+plt.xlim(3e6, 4.5e6)  
+plt.ylim(2e6, 3.3e6)
+plt.show()
+```
+
+Nous pouvons aussi  générer le contour des départements en faisant l'union de toutes les géométries. L'attribut [unary_union](https://geopandas.org/en/stable/docs/reference/api/geopandas.GeoSeries.unary_union.html) de `GeoSeries` renvoie cette union des objets géométriques. Dans notre cas, l'union des départements est un multi-polygone en raison des départements ultramarins. Nous allons en extraire la liste des polygones le composant et l'utiliser pour construire un `GeoDataFrame`. Cette transformation facilitera l'affichage et les traitements par la suite.
+
+```python
+# Process the union of all geometries (a multipolygon in our case)
+union_dept = dept["geometry"].unary_union
+print(union_dept)
+
+# Decompose the multipolygon as a list of polygons
+list_union_dept = list(union_dept.geoms)
+
+# Store this list of polygons in a GeoDataFrame 
+union_dept = gpd.GeoDataFrame( geometry = list_union_dept )
+
+# Plot the result
+union_dept.plot(facecolor="none", linewidth=0.2)
+```
+
+Supposons que l'on souhaite en extraire le contours de la France métropolitaine. Il suffit de sélectionner la zone avec la surface la plus importante en utilisant l'attribut `area`.
+
+```python
+# Process the area of all polygons and add the information in a nex column "surface"
+union_dept['surface'] = union_dept['geometry'].area
+
+# Get the index of the object with the largest area
+id_polygon_max_area =  union_dept['surface'].idxmax()
+
+# Get the polygon with the largest area
+polygon_max_surface = union_dept.loc[id_polygon_max_area, 'geometry']
+
+# Display the polygon
+x, y = polygon_max_surface.exterior.xy
+plt.plot(x, y, color='black', linewidth=1)
+```
+
+`GeoPandas` permet aussi de simplifier les géométries (méthode [simplify](https://geopandas.org/en/stable/docs/reference/api/geopandas.GeoSeries.simplify.html)), de calculer les enveloppes convexes (méthode [convex_hull](https://geopandas.org/en/stable/docs/reference/api/geopandas.GeoSeries.convex_hull.html)) ou de calculer le rectangle englobant minimum (méthode [envelope](https://geopandas.org/en/stable/docs/reference/api/geopandas.GeoSeries.envelope.html)), et bien d'autres transformations géométriques (cf. méthodes de la classe [GeoSeries](https://geopandas.org/en/stable/docs/reference/api/geopandas.GeoSeries.html)).
+
+```python
+# Simplification 
+union_simplif = union_dept.simplify(tolerance=100000)
+
+union_simplif.plot(facecolor="none", linewidth=0.2)
+plt.xlim(3e6, 4.5e6)  
+plt.ylim(2e6, 3.3e6)
+plt.show()
+
+# Convex hull
+union_convex_hull = union_dept.convex_hull
+
+union_convex_hull.plot(facecolor="none", linewidth=0.2)
+plt.xlim(3e6, 4.5e6)  
+plt.ylim(2e6, 3.3e6)
+plt.show()
+
+# Minimum bounding box
+union_bounding_box = union_dept.envelope
+
+union_bounding_box.plot(facecolor="none", linewidth=0.2)
+plt.xlim(3e6, 4.5e6)  
+plt.ylim(2e6, 3.3e6)
+plt.show()
+```
+
+Agréger des données pour faire des calculs est une opération classique lorsque l'on analyse des données. Dans le cas de données spatiales, il s'agit de combiner des géométries en unités spatiales plus grossières basées sur certains attributs (p.ex. des quartiers vers les villes). Ce processus inclut souvent le calcul de statistiques récapitulatives (p.ex. le nombre d'habitants, le salaire moyen, la surface moyenne, etc.). 
+
+Pour illustrer cela, nous allons utiliser un nouveau [jeu de données produit par la métropole Aixe-Marseille-Provence](https://www.data.gouv.fr/fr/datasets/tarif-de-leau-potable-et-de-lassainissement-par-commune/) et contenant le tarif de l'eau potable et de l'assainissement par commune au 1er janvier. Nous allons commencer par charger ce fichier, appelé `ls-tarif-de-l-eau-potable-et-de-l-assainissement-par-commune.zip`, et par afficher les premiers enregistrements de celui-ci.
+
+```python
+# Read the file and display first tuples
+tarif_eau = gpd.read_file("../data/ls-tarif-de-l-eau-potable-et-de-l-assainissement-par-commune.zip")
+display(tarif_eau.head())
+
+# Display a map and a legend with prices
+tarif_eau.plot(column="tarif_au_m3", legend=True)
+
+plt.axis("off")
+plt.show()
+```
+
+Avec la bibliothèque `Pandas`, il est possible de regrouper et agréger des données à l'aide de la méthode [groupby](https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.groupby.html) de `DataFrame`. Dans `GeoPandas`, il existe aussi une fonction de `GeoDataFrame`,  appelée [dissolve](https://geopandas.org/en/stable/docs/user_guide/aggregation_with_dissolve.html), qui permet de regrouper les données en fonction d'une colonne d'attribut et de faire l'union des géométries de chaque groupe de cet attribut. En même temps, est possible des calculer des statistiques (p.ex. moyenne, minimum, somme, etc.) sur ces attributs. 
+
+Pour illustrer ce fonctionnement, nous allons ajouter à nos données une nouvelle colonne permettant d'indiquer les communes avec un tarif supérieur à la moyenne. Pour cela, nous allons tout d'abord ajouter une nouvelle colonne vide `prix_eleve`, puis nous allons ajouter un booléen indiquant si le tarif est supérieur au prix moyen dans l'agglomération. Le code suivant exploite les [fonctionnalités d'indexation et de sélection implémentées dans Pandas](http://pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html), et notamment la fonction [loc](https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.loc.html) de `DataFrame`.
+
+```python
+# Create a new column and add a constant value
+tarif_eau["prix_eleve"] = False
+
+# Filter rows with above average price and update the column prix_eleve
+tarif_eau.loc[ tarif_eau["tarif_au_m3"] > tarif_eau["tarif_au_m3"].mean(), "prix_eleve" ] = True
+
+# Check number of rows per category
+tarif_eau.prix_eleve.value_counts()
+```
+
+Nous pouvons ensuite utiliser cette nouvelle colonne pour agréger ("dissoudre") les données en deux groupes ("communes avec un prix supérieur à la moyenne" et "communes avec un prix inférieur ou égal à la moyenne"), et calculer en même temps le prix médian pour chacun de ces sous-groupes. Pour faire ce calcul, nous allons utiliser le paramètre [aggfunc](https://geopandas.org/en/stable/docs/user_guide/aggregation_with_dissolve.html#dissolve-arguments) de la fonction [dissolve](https://geopandas.org/en/stable/docs/user_guide/aggregation_with_dissolve.html). De plus, l'agrégation nécessite que nous fassions une sélection des colonnes numériques que nous souhaitons inclure dans la sortie.
+
+```python
+# Conduct the aggregation
+dissolved = tarif_eau[ ["tarif_au_m3", "prix_eleve", "geometry"]].dissolve(
+    by="prix_eleve", aggfunc="median" 
+)
+display(dissolved)
+```
+
+Suite à cette agrégation, l'index de la `GeoDataFrame` résultant devient un index multi-niveaux composé des différentes colonnes. L'accès et la manipulation des enregistrements du `GeoDataFrame` devient donc un peu plus complexe. Par exemple, il faut spécifier les valeurs des différents niveaux pour accéder à des enregistrements (et non simplement un indice numérique). Pour éviter cela, nous pouvons régénérer l'index avec la méthode [reset_index](https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.reset_index.html).
+
+```python
+dissolved = dissolved.reset_index()
+```
+
+Puis, nous pouvons afficher une nouvelle carte des prix de l'eau mettant en avant les zones avec un prix moyen supérieur à la moyenne.
+
+```python
+dissolved.plot(column="prix_eleve", legend=True)
+
+plt.axis("off")
+plt.show()
+```
 
 #### Quelques traitements basiques avec les données vectorielles
 

@@ -5,7 +5,7 @@
 layout: home
 ---
 
-**Objectifs** : l'objectif de ce cours est d'introduire les notions de bases en fouille de données spatiales et spatio-temporelles. Il s'agit d'une traduction et d'une synthèse de différents cours, notamment du cours de [Geospatial Analysis with Pyton and R](https://kodu.ut.ee/~kmoch/geopython2021/index.html), du livre [Introduction to Python for Geographic Data Analysis](https://pythongis.org/index.html) et du tutoriel [Python for Geospatial Analysis](https://www.tomasbeuzen.com/python-for-geospatial-analysis/README.html).
+**Objectifs** : l'objectif de ce cours est d'introduire les notions de bases en analyse de données géographiques. Il s'agit d'une traduction et d'une synthèse de différents cours, notamment du cours de [Geospatial Analysis with Pyton and R](https://kodu.ut.ee/~kmoch/geopython2021/index.html), du livre [Introduction to Python for Geographic Data Analysis](https://pythongis.org/index.html) et du tutoriel [Python for Geospatial Analysis](https://www.tomasbeuzen.com/python-for-geospatial-analysis/README.html).
 
   
 
