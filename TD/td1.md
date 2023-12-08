@@ -197,6 +197,26 @@ centroid_type = type(l_centroid)
 print("Type of the centroid:", centroid_type)
 ```
 
+Une opération géospatiale typique consiste à voir si une géométrie en croise ou en touche une autre. Pour faire cela avec `Shapely`, il suffit d'utiliser l'une des méthodes suivantes: 
+- [intersects()](https://shapely.readthedocs.io/en/stable/manual.html#object.intersects) qui retourne vrai si la limite ou l'intérieur d'un objet croise de quelque manière que ce soit la limite ou l'intérieur de l'autre objet.
+- [touches()](https://shapely.readthedocs.io/en/stable/manual.html#object.touches) qui retourne vrai si les objets ont au moins un point en commun et que leurs intérieurs ne croisent aucune partie de l'autre objet.
+
+```python
+from shapely.geometry import LineString, MultiLineString
+
+# Create two lines
+line_a = LineString([(0, 0), (1, 1)])
+line_b = LineString([(1, 1), (0, 2)])
+
+# Check if lines intersects
+lines_intersect = line_a.intersects(line_b)
+print("Do lines intersect ? ",lines_intersect)
+
+# Check if lines touches
+lines_touche = line_a.touches(line_b)
+print("Do lines touch ? ",lines_touche)
+```
+
 #### Créer et manipuler des polygones
 
 La création d'un objet `Polygon` poursuit la même logique que celle des `Point` et `LineString`. Le polygone a néanmoins besoin d'au moins trois tuples de coordonnées (ou trois points). A noter aussi que les coordonnées d'un polygone sont entourées de deux parenthèses (p.ex. `POLYGON ((2.2 4.2, 7.2 -25.1, 9.26 -2.456, 2.2 4.2))`) car il est possible aussi d'avoir des trous dans les polygones. Tout comme précédemment, nous pouvons accéder à différents attributs du polygone tels que la surface, le centroïde, son enveloppe ("minimal bounding box), son contour, son périmètre etc.
@@ -237,6 +257,57 @@ print("Poly Exterior: ", poly_ext)
 poly_ext_length = poly_ext.length
 print("Poly Exterior Length: ", poly_ext_length)
 ```
+
+Déterminer si un  point est situé à l'intérieur ou à l'extérieur d'une zone est aussi une opération géospatiale classique,  souvent utilisée pour sélectionner des données en fonction de l'emplacement. Il existe essentiellement deux manières de tester cette inclusion avec `Shapely` :
+- en utilisant la fonction [within()](https://shapely.readthedocs.io/en/stable/manual.html#object.within) qui vérifie si un point se trouve dans un polygone
+- en utilisant une fonction appelée [contains()](https://shapely.readthedocs.io/en/stable/manual.html#object.contains) qui vérifie si un polygone contient un point
+
+```python
+from shapely.geometry import Point, Polygon
+
+# Create Point objects
+p1 = Point(24.952242, 60.1696017)
+p2 = Point(24.976567, 60.1612500)
+
+# Create a Polygon
+coords = [
+    (24.950899, 60.169158),
+    (24.953492, 60.169158),
+    (24.953510, 60.170104),
+    (24.950958, 60.169990),
+]
+poly = Polygon(coords)
+
+# Let's check what we have
+print(p1)
+print(p2)
+print(poly)
+
+# Check if p1 is within the polygon using the within function
+p1_within = p1.within(poly)
+print("p1 is within the polygon :", p1_within)
+
+# Does polygon contain p1?
+contains_p1 = poly.contains(p1)
+print("poly contains p1 :", contains_p1)
+
+# Check if p2 is within the polygon
+p2_within = p2.within(poly)
+print("p2 is within the polygon :", p2_within)
+
+# Does polygon contain p2?
+contains_p2 = poly.contains(p2)
+print("poly contains p2 :", contains_p2)
+```
+
+
+Même si nous nous focalisons ici sur l'inclusion d'un point donné dans un polygone, il est également possible de vérifier si une `LineString` ou un `Polygon` se trouve à l'intérieur d'un autre `Polygon`.
+
+
+
+
+
+
 
 #### Créer et manipuler des collections d'objets géométriques
 
@@ -633,11 +704,11 @@ plt.axis("off")
 plt.show()
 ```
 
-#### Quelques traitements basiques avec les données vectorielles
 
-les unité pour les longueurs distance  -> simple disatnce encliudienne(https://shapely.readthedocs.io/en/stable/manual.html#coordinate-systems) 
+### Traiter des données réparties entre plusieurs jeux de données
 
-distance : https://kodu.ut.ee/~kmoch/geopython2021/L1/Geometric-Objects.html#side-note-on-distances-in-gis
+
+
 
 
 
