@@ -139,7 +139,7 @@ print(point3D)
 print(type(point1))
 ```
 
-La classe `Point` contient un certain nombre de méthodes et attributs permettant par exemple d'accéder aux coordonnées (attribut `coords`), à son abscisse (attribut `x`), à son ordonnée (attribut `y`) ou de calculer une distance à un autre point (méthode `distance(Point)`). A noter que le type de `coords` est `CoordinateSequence` et non un tableau de valeur. Pour obtenir ce tableau avec les coordonnées, il faut passer par l'attribut `xy` de `CoordinateSequence`, qui est un tableau `numpy` de nombres réels double précision (`double`). Le code suivant illustre cela. Pour le tester, il vous faut ajoute rune cellule de code  dans votre fichier `readVectorData.ipynb`,  copier le texte suivant et l'exécuter.
+La classe `Point` contient un certain nombre de méthodes et attributs permettant par exemple d'accéder aux coordonnées (attribut `coords`), à son abscisse (attribut `x`), à son ordonnée (attribut `y`) ou de calculer une distance à un autre point (méthode `distance(Point)`). A noter que le type de `coords` est `CoordinateSequence` et non un tableau de valeur. Pour obtenir ce tableau avec les coordonnées, il faut passer par l'attribut `xy` de `CoordinateSequence`, qui est un tableau `numpy` de nombres réels double précision (`double`). Le code suivant illustre cela. Pour le tester, il vous faut ajouter une cellule de code  dans votre fichier `readVectorData.ipynb`,  copier le texte suivant et l'exécuter.
 
 ```python
 # Get only x coordinates of Point1
@@ -157,6 +157,41 @@ print(type(point_coords))
 xy = point_coords.xy
 print(xy)
 ```
+
+Une tâche SIG couramment utilisée consiste à être capable de trouver le voisin le plus proche d'un objet ou d'un ensemble d'objets. Par exemple, vous pouvez avoir un  objet `Point` représentant votre emplacement, puis un autre ensemble de `Point` représentant par exemple les arrêts de transports en commun. Une question assez typique est alors de savoir lequel des arrêts est le plus proche de chez moi. Il s'agit d'une analyse typique du plus proche voisin, dont le but est de trouver la géométrie la plus proche d'une autre géométrie.
+
+En Python, ce type d'analyse peut être effectué avec une fonction `Shapely` appelée [nearest_points()](https://shapely.readthedocs.io/en/stable/manual.html#nearest-points) qui renvoie un tuple des points les plus proches dans les géométries d'entrée. Elle permet d'avoir le point le plus proche d'un ensemble de points par rapport à un point d'origine, mais aussi les deux points les plus proches entre deux polygones. Dans ce dernier cas, il est important de noter que le point le plus proche peut ne pas être un noeud des géométries en entrée. 
+
+```python
+from shapely.geometry import Point, MultiPoint
+from shapely.ops import nearest_points
+
+# Origin point
+orig = Point(0, 0)
+
+# Destination points
+dest1 = Point(0, 1.45)
+dest2 = Point(2, 2)
+dest3 = Point(0, 2.5)
+dest4 = Point(1.45, 0)
+
+destinations = MultiPoint([dest4, dest2, dest3, dest1])
+print(destinations)
+
+# Processing A nearest point from orig
+nearest_geoms = nearest_points(orig, destinations)
+print( type(nearest_geoms) )
+
+print(nearest_geoms)
+print(nearest_geoms[0])
+print(nearest_geoms[1])
+```
+
+On note dans cet exemple que si plusieurs points sont les plus proches, la méthode va n'en retourner qu'un seul. Dans notre cas, il s'agit du premier rencontré.
+
+
+
+
 
 #### Créer et manipuler des lignes
 
@@ -707,9 +742,130 @@ plt.show()
 
 ### Traiter des données réparties entre plusieurs jeux de données
 
+Lorsque l'on étudie une problématique, nous devons souvent croiser des informations de sources diverses. Pour cela, il est nécessaire au cours du processus d'analyse de faire le lien entre ces différentes données. On parle aussi d'en faire la jointure au sens des "bases de données", i.e. d'associer les enregistrements des différentes sources en fonction des valeurs d'un ou plusieurs attributs communs. Lorsque le critère de jointure est spatial, on parle alors de `jointure spatiale`. Il s'agit d'une  tâche classique lorsque l'on manipule des données SIG.. Obtenir des attributs d'une couche et les transférer dans une autre couche en fonction de leur relation spatiale est une opération que vous devrez probablement faire régulièrement.
 
 
+`GeoPandas` implémente la notion de [jointure spatiale](https://geopandas.org/en/stable/docs/user_guide/mergingdata.html).  Il permet de faire différents types de jointures spatiales grâce à sa méthode [sjoin()](https://geopandas.org/en/stable/docs/reference/api/geopandas.sjoin.html) prenant en paramètre deux `GeoDataFrame` et son paramètre `predicate`. Les trois types de jointures spatiales suivantes sont notamment inclues :
+- "`intersects`" qui permet de relier deux enregistrements s'ils s'intersectent spatialement
+- "`within`" qui permet de relier deux enregistrements si l'enregistrement du premier `GeoDataFrame` ("gauche") est à l'intérieur de celui du deuxième `GeoDataFrame` ("droite")
+- "`contains`" qui permet de relier deux enregistrements si l'enregistrement du premier `GeoDataFrame` ("gauche") est à l'intérieur de celui du deuxième `GeoDataFrame` ("droite")
 
+
+D'autres prédicats binaires peuvent être utilisés en fonction du type d'objets géométriques passés en paramètres. Il s'agit des prédicats supportés par `Shapely`. Pour connaître la liste des prédicats supportés par un `GeoDataFrame` donné, il est possible d'utiliser son attribut `sindex.valid_query_predicates`.
+
+Afin de tester la jointure spatiale, nous allons utiliser deux jeux de données : l'un contient les [contours des quartiers de Marseille](https://www.data.gouv.fr/fr/datasets/quartiers-de-marseille/) et l'autre donne des informations sur les [disponibilités des parkings dans la métropole Aix-Marseille-Provence](https://www.data.gouv.fr/fr/datasets/disponibilites-en-temps-reel-des-places-de-parkings/) à un instant donné. Vous pouvez trouver ces deux jeux de données dans le répertoire `/data`. Ils sont au format `Shapefile` et `GeoJson` respectivement. L'objectif sera de s'appuyer sur ces données pour afficher les parkings ayant plus de 50 places disponibles dans le quartier de La Joliette à Marseille.
+
+Nous allons donc commencer par charger ces données et les afficher.
+
+```python
+import geopandas as gpd
+import matplotlib.pyplot as plt
+
+# Load Marseille districts
+quartiers_marseille = gpd.read_file('../data/quartiersmarseille.zip')
+
+display(quartiers_marseille)
+quartiers_marseille.plot()
+plt.show()
+
+# Load parkings in Aix Marseille Provence
+parkings = gpd.read_file('../data/disponibilites-des-places-de-parkings.geojson')
+
+display( parkings.head() )
+parkings.plot()
+plt.show()
+```
+
+Afin d'alléger le coût de la jointure spatiale entre ces deux jeux de données, nous allons effectuer des projections, i.e. sélectionner uniquement les attributs et enregistrements nécessaires à nos traitements.
+
+```python
+# Keep only selected columns of the parking dataset
+parkings = parkings[ ["nom","adresse","commune","voitureplacesdisponibles","geometry"] ]
+display( parkings.head() )
+
+# Keep only rows corresponding to parking whit at least 50 free places 
+min_parking_space = 50
+selected_parkings = parkings[ parkings["voitureplacesdisponibles"] >= min_parking_space ]
+display(selected_parkings.head())
+
+# Keep only the shape of the La Joliette district 
+district_name = "JOLIET"
+selected_district = quartiers_marseille[ quartiers_marseille["NOM_QUA"].str.contains(district_name) ]
+display(selected_district)
+```
+
+Nous pouvons maintenant effectuer la jointure spatiale entre ces deux jeux de données. L'objectif étant de cibler les parkings du quartier de La Joliette, nous allons utiliser le prédicat `within` pour relier les enregistrements.
+
+```python
+# Spatial join of parkings (having free places) within the selected district
+parking_selected_district = gpd.sjoin( selected_parkings, selected_district, predicate="within")
+
+display(parking_selected_district)
+```
+
+Nous obtenons alors une erreur `"CRS mismatch between the CRS of left geometries and the CRS of right geometries ...`". Comme indiqué, les deux `GeoDataFrame` utilisés ne sont pas projetés dans le système de coordonnées (`WGS84/EPSG:4326` pour les parkings et `Lambert93/EPSG:2154` pour les quartiers de Marseille), ce qui pose des problèmes lors de la jointure. Le référentiel `EPSG:2154` étant centré sur la France, il sera donc plus précis. Nous allons donc reprojeter le jeu de données contenant les parkings sélectionnés dans ce dernier, et refaire la jointure spatiale. 
+
+```python
+# Project the GeoDataFrame to EPSG:2154  
+selected_parkings = selected_parkings.to_crs(2154)
+
+# Spatial join of parkings (having free places) within the selected district
+parking_selected_district = gpd.sjoin( selected_parkings, selected_district, predicate="within")
+
+display(parking_selected_district)
+```
+
+Nous pouvons maintenant afficher le résultat final sur une carte en superposant les différentes informations.
+
+```python
+# Create a plot with subplots/layers
+fig, ax = plt.subplots(figsize=(10, 10))
+
+# Add Marseille dsitricts to the plot
+quartiers_marseille.plot(ax=ax, color='lightgrey')
+
+# Add and highlight the selected district
+selected_district.plot(ax=ax, color='red')
+
+# Add available parkings to the plot
+parking_selected_district.plot(ax=ax, color='blue', markersize=2)
+
+# Add a legend
+red_patch = plt.Line2D([0], [0], marker='o', color='w', markerfacecolor='red', markersize=10, label='Quartier sélectionné')
+blue_patch = plt.Line2D([0], [0], marker='o', color='w', markerfacecolor='blue', markersize=10, label='Parkings avec au moins 50 places disponibles')
+ax.legend(handles=[red_patch, blue_patch])
+
+# Display the plot
+plt.show()
+```
+
+La jointure spatiale dans `Geopandas` peut être très performante car il est possible d'utiliser des index spatiaux pour accélérer les requêtes. Pour cela, il suffit d'appeler la méthode [set_index()](https://pandas.pydata.org/pandas-docs/version/0.22.0/generated/pandas.DataFrame.set_index.html) (issue de `DataFrame`) sur la colonne `"geometry"` avant de faire la jointure. 
+
+```python
+selected_parkings =  selected_parkings.set_index("geometry")
+selected_district = selected_district.set_index("geometry")
+
+# Spatial join with saptial index
+parking_selected_district = gpd.sjoin( selected_parkings, selected_district, predicate="within")
+```
+Les index spatiaux s'appuient généralement sur une structure de données de type `R-tree` pour accélérer les calculs. L'idée principale du `R-tree` est de représenter les objets spatialement proches par  des rectangles englobants ("minimum bounding box") de plus ou moins grandes tailles et organisés au sein d'une hiérarchie spatiale (une arborescence). Autrement dit, chaque rectangle représente un ensemble d'objets spatiaux à un certain niveau de granularité, et ses niveaux sont organisés en arborescence. La figure suivante illustre cela.
+
+
+![r-tree](td1-img/2-Rtree-IBM.png)
+
+
+Cette structure permet de trouver rapidement un objet, car il n'est pas nécessaire de parcourir toutes les géométries du jeu de données mais simplement les rectangles le contenant. Ces rectangles permettent aussi de facilement trouver des objets spatialement proches. Ces index spatiaux permettent des traitements près de 20x plus rapide dans certains cas. 
+
+Comme nous l'avons vu précédemment, un `GeoDataFrame` peut être modifié au cours de l'analyse des données. Des objets peuvent par exemple être supprimés ou ajoutés. Dans ce cas, il peut être important de reconstruire (totalement ou partiellement) l'index spatial afin de mettre à jours le `r-tree`. Ceci est possible grâce à la méthode `set_index("geometry")` du `GeoDataFrame`.
+
+Lorsque l'on fait une jointure spatiale entre un polygone et un ensemble de points, 
+il existe cependant une situation particulière dans laquelle l'index spatial n'apporte aucune amélioration des performances : si votre polygone et vos points ont un rectangle englobant assez similaire. Dans ce cas, l'index spatial n'aide pas à accélérer les requêtes car il s'appuie justement sur cette hiérarchie de rectangles englobants (cf. [R-tree Spatial Indexing with Python](https://geoffboeing.com/2016/10/r-tree-spatial-index-python/)). 
+
+![problematic rtree](td1-img/2-los-angeles-boundary-intersections.png)
+
+Il existe cependant une stratégie assez simple pour régler ce problème. Il suffit de de subdiviser le polygone en sous-ensembles de polygones plus petits (avec des rectangles englobants plus petits donc ).
+
+![solution rtree](td1-img/2-los-angeles-boundary-quadrats-intersections.png)
 
 
 #### Exercice
@@ -724,3 +880,8 @@ https://pythongis.org/part2/chapter-05/nb/01-introduction-to-geographic-data-in-
 
 Comme pour les données vectorielles, il existe différents formats de fichiers pour stocker les données raster. Le plus courant est `GeoTIFF` ( .tif), qui est essentiellement un fichier image contenant des métadonnées de géoréférencement. Le package de base pour travailler avec des données raster en Python est rasterio .
 
+
+
+# Analyser des données spatiales avec Scikit-Learn
+
+https://pythongis.org/part2/chapter-06/nb/06-operations-between-multiple-datasets.html#nearest-neighbor-analysis-with-large-datasets
