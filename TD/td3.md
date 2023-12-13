@@ -423,7 +423,7 @@ with rasterio.open(output_path, "w", **out_meta) as dest:
     dest.write(out_image)
 ```
 
-Pour vérifier le résultat, il suffit d'ouvrir le nouveau raster et de l'afficher.
+Pour vérifier le résultat, il suffit d'ouvrir le nouveau raster et de l'afficher. On constate aussi que la taille du fichier correspondant est beaucoup plus petite (16 Mo) que la taille de la mosaïque (900 Mo).
 
 ```python
 # Read the clipped raster
