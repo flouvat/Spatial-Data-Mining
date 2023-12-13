@@ -203,11 +203,11 @@ Le code suivant accède à une bande, ainsi qu'à la valeur d'un pixel, en utili
 
 ```python
 # Get all the values of the first band
-band5 = big_data.isel(band=4).values
+band5 = big_data.isel(band=0).values
 print(band5)
 
 # Get the value of pixel (1000,500) fro the first band
-value_pixel = big_data.isel(band=4, x=1000, y=500).values
+value_pixel = big_data.isel(band=0, x=1000, y=500).values
 print(value_pixel)
 ```
 Nous modifions ensuite notre structure de données pour associer des étiquettes aux différentes bandes, et ainsi pouvoir accéder aux valeurs plus simplement.
@@ -230,4 +230,207 @@ print("\n Near Infrared band: ",band5)
 # Get the value of pixel (1000,500) fro the first band
 value_pixel = big_data.isel(x=1000, y=500).sel(band="Near Infrared").values
 print("NIR value for a specific pixel:",value_pixel)
+```
+# Traiter des données rasters
+
+Nous allons maintenant voir quelques opérations classiques faites sur les rasters.
+
+## Reprojeter un raster
+
+ Lorsque l'on doit effectuer des opérations et des analyses spatiales, il est important de s'assurer que les données manipulées se trouvent dans le même système de coordonnées  de référence. Il est donc courant de devoir reprojeter un raster dans un autre référentiel afin de garantir la précision des calculs.
+
+ Dans l'exemple ci-dessous, nous reprenons notre image `RapidEye` et la projetons dans le référentiel `WGS84`.
+
+```python
+import rasterio
+from rasterio.enums import Resampling
+from rasterio.warp import calculate_default_transform, reproject
+
+# Read the source raster
+with rasterio.open('../data/raster/Poro/2011_.tif') as src:
+
+    # Define the new CRS (WGS84)
+    new_crs = 'EPSG:4326'  
+
+    # Calculate the transformation and the dimensions of the new raster
+    transform, width, height = calculate_default_transform(
+        src.crs, new_crs, src.width, src.height, *src.bounds)
+
+    # Copy the metadata of the source raster
+    kwargs = src.meta.copy()
+    kwargs.update({
+        'crs': new_crs,
+        'transform': transform,
+        'width': width,
+        'height': height
+    })
+
+    # Create a new raster with all the bands in the new CRS
+    with rasterio.open('../data/raster/Poro/2011_WGS84.tif', 'w', **kwargs) as dst:
+        for i in range(1, src.count + 1):
+            reproject(
+                source=rasterio.band(src, i),
+                destination=rasterio.band(dst, i),
+                src_transform=src.transform,
+                src_crs=src.crs,
+                dst_transform=transform,
+                dst_crs=new_crs,
+                resampling=Resampling.nearest
+            )
+```
+
+Nous pouvons vérifier le raster a bien été projeté dans le nouveau système de coordonnées.
+
+```python
+# Read the initial Rapideye image
+poro_2011 = rasterio.open('../data/raster/Poro/2011_.tif')
+print(poro_2011.crs)
+
+# Read the Rapideye image in WGS84 projection
+poro_2011_WGS84 = rasterio.open('../data/raster/Poro/2011_WGS84.tif')
+print("\n",poro_2011_WGS84.crs)
+```
+
+**Attention**, lorsque les traitements à effectuer s'appuient sur des distances ou des surfaces, il est important d'utiliser un système de coordonnées métrique. Dans l'exemple précédent, le référentiel de départ était RGNC91-93 basé sur la projection Lambert NC. Ce référentiel est déjà métrique, alors que WGS84 ne l'est pas (les mesures sont exprimées en degrés de latitude et longitude). 
+
+## Créer une mosaïque de rasters
+
+Il est souvent nécessaire de fusionner plusieurs rasters. Par exemple, un satellite peut ne capturer qu'une partie d'une zone ciblée lors d'un passage et une autre partie lors d'un second passage. Dans ce cas, il est nécessaire de fusionner les deux images pour avoir des données sur l'ensemble de la zone d'étude. On dit encore que l'on créé une mosaïque de rasters. `Rasterio` offre aussi des fonctionnalités permettant de faire cette opération.
+
+Pour illustrer cela, nous allons utiliser deux images satellites [Landsat-7](https://www.indexdatabase.de/db/s-single.php?id=8) mise à disposition par l'[USGS](https://www.usgs.gov/landsat-missions/landsat-data-access) ("US Geological Service"). Ces deux images capturent des parties différentes de la région autour de Marseille. L'objectif est de les fusionner en un seul raster. 
+
+Nous commençons par lire et afficher ces deux rasters.
+
+```python
+import rasterio
+from rasterio.plot import show
+import matplotlib.pyplot as plt
+
+# Read and display the two rasters
+marseille_nord = rasterio.open("../data/raster/Marseille/marseille_nord.tif")
+marseille_sud = rasterio.open("../data/raster/Marseille/marseille_sud.tif")
+
+plt.axis("off")
+show(marseille_nord)
+plt.axis("off")
+show(marseille_sud)
+```
+
+Nous les fusionnons ensuite en mémoire et enregistrons le raster résultant.
+
+```python
+from rasterio.merge import merge
+
+# Create a list of the rasters to merge
+src_files_to_mosaic = [marseille_nord, marseille_sud]
+
+# Merge the rasters
+mosaic, out_trans = merge(src_files_to_mosaic)
+
+# Get the spatial informations for the raster mosaic 
+out_meta = marseille_nord.meta.copy()
+out_meta.update({
+    "driver": "GTiff",  # Le format de sortie, dans cet exemple, GeoTIFF
+    "height": mosaic.shape[1],
+    "width": mosaic.shape[2],
+    "transform": out_trans
+})
+
+# Save the mosaic in a new file
+output_path = "../data/raster/Marseille/mosaique.tif"
+with rasterio.open(output_path, "w", **out_meta) as dest:
+    dest.write(mosaic)
+
+# Display the newly created mosaic
+plt.axis("off")
+show(rasterio.open(output_path))
+```
+
+## Découper un raster en fonction d'une emprise
+
+Une autre opération classique consiste à découper un raster en fonction d'un polygone ("clipping"). Le polygone représente les limites d'une zone d'intérêt (p.ex. une ville). On peut par exemple utiliser les données vectorielles décrivant les quartiers de la ville de Marseille pour découper l'image précédente. En effet, ce raster est de taille importante. Son emprise spatiale est bien au delà des limites de Marseille. Si l'objectif est d'étudier Marseille, il contient donc beaucoup de  données inutiles qui pourraient ralentir les autres traitements. Il faut donc les supprimer et ne conserver que les données de la ville.
+
+Afin de constater cela, nous allons à nouveau ouvrir la mosaïque précédente en utilisant ` .
+
+```python
+import xarray as xr
+import matplotlib.pyplot as plt
+
+# Load a Landsat-7 mosaic
+marseille_mosaique= rasterio.open("../data/raster/Marseille/mosaique.tif")
+           
+print(marseille_mosaique)  
+
+# Check the CRS
+print("CRS:",marseille_mosaique.crs)
+
+# Display the raster
+plt.title("Landsat-7 RGB Image")
+plt.axis("off")
+show(marseille_mosaique)
+```
+
+Nous allons ensuite charger les données vectorielles représentant les quartiers de Marseille.
+
+```python
+import geopandas as gpd
+import matplotlib.pyplot as plt
+
+# Load Marseille districts
+quartiers_marseille = gpd.read_file('../data/vector/quartiersmarseille.zip')
+
+# Check the CRS
+print("CRS:",quartiers_marseille.crs)
+
+quartiers_marseille.plot()
+plt.axis("off")
+plt.show()
+```
+
+On constate alors que les données n'ont pas le même système de coordonnées. Nous allons donc projeter les données vectorielles dans le référentiel du raster (EPSG:32631, i.e. WGS 84 / UTM zone 31N).
+
+```python
+quartiers_marseille = quartiers_marseille.to_crs(epsg=32631)
+```
+
+Nous allons ensuite procéder au découpage du raster gra^ce à la méthode [mask()](https://rasterio.readthedocs.io/en/stable/api/rasterio.mask.html) de `Rasterio`.
+
+```python
+import geopandas as gpd
+import xarray as xr
+import rasterio
+from rasterio.mask import mask
+from shapely.geometry import mapping
+
+# Select all polygons 
+shapes = [mapping(geom) for geom in quartiers_marseille.geometry]
+
+# Clip the raster regarding input polygons
+out_image, out_transform = mask(dataset=marseille_mosaique, shapes=shapes, crop=True)
+
+# Define the metadata of the resulting raster
+out_meta = marseille_mosaique.meta.copy()
+out_meta.update({
+        "driver": "GTiff",
+        "height": out_image.shape[1],
+        "width": out_image.shape[2],
+        "transform": out_transform
+    })
+
+# Save the clipped raster
+output_path = "../data/raster/Marseille/marseille.tif"
+with rasterio.open(output_path, "w", **out_meta) as dest:
+    dest.write(out_image)
+```
+
+Pour vérifier le résultat, il suffit d'ouvrir le nouveau raster et de l'afficher.
+
+```python
+# Read the clipped raster
+marseille_clip= rasterio.open("../data/raster/Marseille/marseille.tif")
+           
+# Display the raster
+plt.title("Landsat-7 RGB Image")
+plt.axis("off")
+show(marseille_clip)
 ```
