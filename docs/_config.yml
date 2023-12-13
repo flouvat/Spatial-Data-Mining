@@ -18,7 +18,7 @@
 # You can create any custom variable you would like, and they will be accessible
 # in the templates via {{ site.myvariable }}.
 
-title: Fouille de données Spatiales et Spatio-Temporelles
+title: Analyse de données Spatiales
 email: frederic.flouvat@univ-amu.fr
 description: >- # this means to ignore newlines until "baseurl:"
   cours du Master informatique SID, Aix-Marseille Université
